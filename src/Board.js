@@ -78,8 +78,7 @@
     // --------------------------------------------------------------
     //
     // test if a specific row on this board contains a conflict
-    hasRowConflictAt: function(rowIndex) {
-      let counter = 0;
+    hasRowConflictAt: function(rowIndex, counter = 0) {
       for (let i = 0; i < rowIndex.length; i++) {
         if (rowIndex[i] === 1) {
           counter++;
@@ -107,8 +106,7 @@
     // --------------------------------------------------------------
     //
     // test if a specific column on this board contains a conflict
-    hasColConflictAt: function(colIndex) {
-      let counter = 0;
+    hasColConflictAt: function(colIndex, counter = 0) {
       for (let i = 0; i < colIndex.length; i++) {
         if (colIndex[i] === 1) {
           counter++;

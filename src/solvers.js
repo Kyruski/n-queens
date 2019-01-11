@@ -18,26 +18,55 @@
 window.findNRooksSolution = function(n) {
   var solution = []; 
   let board = []; //new Board({n:n});
-
+  let counter = 0;
   for (let i = 0; i < n; i++) {
     let tempArr = [];
+    solution.push([]);
     for (let k = 0; k < n; k++) {
       tempArr.push('x');
+      counter++;
     }
     board.push(tempArr);
   }
+
+  let bigArray = [];
+  for (let i = 0; i < board.length; i++) {
+    bigArray.push(...board[i]);
+  }
+
   //major = n =+1
   //minor n -1
   //col n
   //row start = (row)*n
   //row end = ((row+1)*n)-1
 
-  console.log(board);
-  for (let i = 0; i < board.length + 1; i++) {
+  let placedRooks = 0;
+  for (let i = 0; i < bigArray.length; i++) {
     let row = Math.floor(i/n);
     let rowStart = (row * n);
     let rowEnd = ((row + 1) * n) - 1;
-    console.log(`row: ${row}, start: ${rowStart}, end: ${rowEnd}`);
+    if (Board.prototype.hasRowConflictAt(bigArray.slice(rowStart, rowEnd + 1), 1)) {
+      bigArray[i] = 0;
+      continue;
+    }
+    let colArr = [];
+    let topOfCol = i % n;
+    for (let j = topOfCol; j < bigArray.length; j += n) {
+      colArr.push(bigArray[j]);
+    }
+    if (Board.prototype.hasColConflictAt(colArr, 1)) {
+      bigArray[i] = 0;
+      continue;
+    }
+    bigArray[i] = 1;
+    placedRooks++;
+
+  }
+  if (placedRooks === n) {
+    for (let i = 0; i < bigArray.length; i++) {
+      let placeRow = Math.floor(i / n);
+      solution[placeRow].push(bigArray[i]);
+    }
   }
 
   // console.log(board);
