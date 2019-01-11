@@ -17,15 +17,30 @@
 
 window.findNRooksSolution = function(n) {
   var solution = []; 
-  let board = [];
+  let board = []; //new Board({n:n});
 
   for (let i = 0; i < n; i++) {
     let tempArr = [];
     for (let k = 0; k < n; k++) {
-      tempArr.push(1);
+      tempArr.push('x');
     }
     board.push(tempArr);
   }
+  //major = n =+1
+  //minor n -1
+  //col n
+  //row start = (row)*n
+  //row end = ((row+1)*n)-1
+
+  console.log(board);
+  for (let i = 0; i < board.length + 1; i++) {
+    let row = Math.floor(i/n);
+    let rowStart = (row * n);
+    let rowEnd = ((row + 1) * n) - 1;
+    console.log(`row: ${row}, start: ${rowStart}, end: ${rowEnd}`);
+  }
+
+  // console.log(board);
 
 
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
