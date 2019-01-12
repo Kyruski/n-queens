@@ -18,13 +18,13 @@
 window.findNRooksSolution = function(n) {
   var solution = []; 
   let board = []; //new Board({n:n});
-  let counter = 0;
+  // let counter = 0;
   for (let i = 0; i < n; i++) {
     let tempArr = [];
     solution.push([]);
     for (let k = 0; k < n; k++) {
       tempArr.push('x');
-      counter++;
+      // counter++;
     }
     board.push(tempArr);
   }
@@ -42,7 +42,7 @@ window.findNRooksSolution = function(n) {
 
   let placedRooks = 0;
   for (let i = 0; i < bigArray.length; i++) {
-    let row = Math.floor(i/n);
+    let row = Math.floor(i / n);
     let rowStart = (row * n);
     let rowEnd = ((row + 1) * n) - 1;
     if (Board.prototype.hasRowConflictAt(bigArray.slice(rowStart, rowEnd + 1), 1)) {
@@ -78,7 +78,61 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var solutionCount = 0; 
+  let board = []; //new Board({n:n});
+  // let counter = 0;
+  for (let i = 0; i < n; i++) {
+    let tempArr = [];
+    // solution.push([]);
+    for (let k = 0; k < n; k++) {
+      tempArr.push('x');
+      // counter++;
+    }
+    board.push(tempArr);
+  }
+  let bigArray = [];
+  for (let i = 0; i < board.length; i++) {
+    bigArray.push(...board[i]);
+  }
+
+  const findNTimes = function (currentBoard, row, piecesPlaced) {
+    let workingBoard = [...currentBoard];
+    for (let i = 0; i < n; i ++) {
+      let placedPieces = piecesPlaced;
+      if (i > 0) {
+        workingBoard[i + (row * n) - 1] = 0;
+      }
+      let rowStart = (row * n);
+      let rowEnd = ((row + 1) * n) - 1;
+      if (Board.prototype.hasRowConflictAt(workingBoard.slice(rowStart, rowEnd + 1), 1)) {
+        workingBoard[i + (row * n)] = 0;
+        continue;
+      }
+      let colArr = [];
+      // let topOfCol = i;
+      for (let j = i; j < workingBoard.length; j += n) {
+        colArr.push(workingBoard[j]);
+      }
+      if (Board.prototype.hasColConflictAt(colArr, 1)) {
+        workingBoard[i + (row * n)] = 0;
+        continue;
+      }
+      workingBoard[i + (row * n)] = 1;
+      placedPieces++;
+      if (row === n - 1) {
+        if (placedPieces === n) {
+          solutionCount++;
+        }
+      } else {
+        findNTimes(workingBoard, row + 1, placedPieces);
+      }
+    }
+  }; 
+
+  findNTimes(bigArray, 0, 0);
+
+
+
 
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
