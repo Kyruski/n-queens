@@ -139,8 +139,7 @@
     // --------------------------------------------------------------
     //
     // test if a specific major diagonal on this board contains a conflict
-    hasMajorDiagonalConflictAt: function(majorDiagonalColumnIndexAtFirstRow) {
-      let counter = 0;
+    hasMajorDiagonalConflictAt: function(majorDiagonalColumnIndexAtFirstRow, counter = 0) {
       for (let i = 0; i < majorDiagonalColumnIndexAtFirstRow.length; i++) {
         if (majorDiagonalColumnIndexAtFirstRow[i] === 1) {
           counter++;
@@ -178,8 +177,7 @@
     // --------------------------------------------------------------
     //
     // test if a specific minor diagonal on this board contains a conflict
-    hasMinorDiagonalConflictAt: function(minorDiagonalColumnIndexAtFirstRow) {
-      let counter = 0;
+    hasMinorDiagonalConflictAt: function(minorDiagonalColumnIndexAtFirstRow, counter = 0) {
       for (let i = 0; i < minorDiagonalColumnIndexAtFirstRow.length; i++) {
         if (minorDiagonalColumnIndexAtFirstRow[i] === 1) {
           counter++;

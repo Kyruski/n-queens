@@ -34,7 +34,7 @@ window.findNRooksSolution = function(n) {
     bigArray.push(...board[i]);
   }
 
-  //major = n =+1
+  //major = n + 1
   //minor n -1
   //col n
   //row start = (row)*n
@@ -104,8 +104,9 @@ window.countNRooksSolutions = function(n) {
       }
       let rowStart = (row * n);
       let rowEnd = ((row + 1) * n) - 1;
+      let currentIndex = i + (row * n);
       if (Board.prototype.hasRowConflictAt(workingBoard.slice(rowStart, rowEnd + 1), 1)) {
-        workingBoard[i + (row * n)] = 0;
+        workingBoard[currentIndex] = 0;
         continue;
       }
       let colArr = [];
@@ -114,10 +115,66 @@ window.countNRooksSolutions = function(n) {
         colArr.push(workingBoard[j]);
       }
       if (Board.prototype.hasColConflictAt(colArr, 1)) {
-        workingBoard[i + (row * n)] = 0;
+        workingBoard[currentIndex] = 0;
         continue;
       }
-      workingBoard[i + (row * n)] = 1;
+      //Minor first     Current location workingBoard[currentIndex]
+      let lowerMinorEnd, upperMinorEnd = false;
+      let minorDiagArray = [];
+      let minorDiagIncrease = n - 1;
+      let minorDiagCounter = 1;
+      while(lowerMinorEnd === false || upperMinorEnd === false) {
+        if (lowerMinorEnd === false) {
+          let currentLowerPosition = (currentIndex) - (minorDiagCounter * minorDiagIncrease);
+          let caluclatedLower = (currentLowerPosition % n === n - 1);
+          minorDiagArray.push(workingBoard[currentLowerPosition]);
+          if (caluclatedLower || currentLowerPosition < 0) {
+            lowerMinorEnd = true;
+          }
+        }
+        if (upperMinorEnd === false) {
+          let currentUpperPosition = (currentIndex) + (minorDiagCounter * minorDiagIncrease);
+          let caluclatedUpper = (currentUpperPosition % n === n - 1);
+          minorDiagArray.push(workingBoard[currentUpperPosition]);
+          if (caluclatedUpper || currentUpperPosition >= workingBoard.length) {
+            upperMinorEnd = true;
+          }
+        }
+        minorDiagCounter++;
+      }
+      if (Board.prototype.hasMinorDiagonalConflictAt(minorDiagArray, 1)) {
+        workingBoard[currentIndex] = 0;
+        continue;
+      }
+      let lowerMajorEnd, upperMajorEnd = false;
+      let majorDiagArray = [];
+      let majorDiagIncrease = n + 1;
+      let majorDiagCounter = 1;
+      while(lowerMajorEnd === false || upperMajorEnd === false) {
+        if (lowerMajorEnd === false) {
+          let currentLowerPosition = (currentIndex) - (majorDiagCounter * majorDiagIncrease);
+          let caluclatedLower = (currentLowerPosition % n === 0);
+          majorDiagArray.push(workingBoard[currentLowerPosition]);
+          if (caluclatedLower || currentLowerPosition < 0) {
+            lowerMajorEnd = true;
+          }
+        }
+        if (upperMajorEnd === false) {
+          let currentUpperPosition = (currentIndex) + (majorDiagCounter * majorDiagIncrease);
+          let caluclatedUpper = (currentUpperPosition % n === 0);
+          majorDiagArray.push(workingBoard[currentUpperPosition]);
+          if (caluclatedUpper || currentUpperPosition >= workingBoard.length) {
+            upperMajorEnd = true;
+          }
+        }
+        majorDiagCounter++;
+      }
+      if (Board.prototype.hasMajorDiagonalConflictAt(majorDiagArray, 1)) {
+        workingBoard[currentIndex] = 0;
+        continue;
+      }
+
+      workingBoard[currentIndex] = 1;
       placedPieces++;
       if (row === n - 1) {
         if (placedPieces === n) {
@@ -140,7 +197,64 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
+  var solution = []; //fixme
+  let board = []; //new Board({n:n});
+  // let counter = 0;
+  for (let i = 0; i < n; i++) {
+    let tempArr = [];
+    solution.push([]);
+    for (let k = 0; k < n; k++) {
+      tempArr.push(0);
+      // counter++;
+    }
+    board.push(tempArr);
+  }
+  let bigArray = [];
+  for (let i = 0; i < board.length; i++) {
+    bigArray.push(...board[i]);
+  }
+
+  const findNTimes = function (currentBoard, row, piecesPlaced) {
+    let workingBoard = [...currentBoard];
+    for (let i = 0; i < n; i ++) {
+      let placedPieces = piecesPlaced;
+      if (i > 0) {
+        workingBoard[i + (row * n) - 1] = 0;
+      }
+      let rowStart = (row * n);
+      let rowEnd = ((row + 1) * n) - 1;
+      if (Board.prototype.hasRowConflictAt(workingBoard.slice(rowStart, rowEnd + 1), 1)) {
+        workingBoard[i + (row * n)] = 0;
+        continue;
+      }
+      let colArr = [];
+      // let topOfCol = i;
+      for (let j = i; j < workingBoard.length; j += n) {
+        colArr.push(workingBoard[j]);
+      }
+      if (Board.prototype.hasColConflictAt(colArr, 1)) {
+        workingBoard[i + (row * n)] = 0;
+        continue;
+      }
+      workingBoard[i + (row * n)] = 1;
+      placedPieces++;
+      if (row === n - 1) {
+        if (placedPieces === n) {
+          for (let i = 0; i < workingBoard.length; i++) {
+            let placeRow = Math.floor(i / n);
+            solution[placeRow].push(workingBoard[i]);
+          }
+        }
+      } else {
+        findNTimes(workingBoard, row + 1, placedPieces);
+      }
+    }
+  }; 
+
+  findNTimes(bigArray, 0, 0);
+
+
+
 
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
