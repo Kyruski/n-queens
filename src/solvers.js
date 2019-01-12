@@ -118,6 +118,73 @@ window.countNRooksSolutions = function(n) {
         workingBoard[currentIndex] = 0;
         continue;
       }
+      
+
+      workingBoard[currentIndex] = 1;
+      placedPieces++;
+      if (row === n - 1) {
+        if (placedPieces === n) {
+          solutionCount++;
+        }
+      } else {
+        findNTimes(workingBoard, row + 1, placedPieces);
+      }
+    }
+  }; 
+
+  findNTimes(bigArray, 0, 0);
+
+
+
+
+  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+  return solutionCount;
+};
+
+// return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
+window.findNQueensSolution = function(n) {
+  var solution = []; //fixme
+  let board = []; //new Board({n:n});
+  // let counter = 0;
+  for (let i = 0; i < n; i++) {
+    let tempArr = [];
+    // console.log ('does solution correction get arrays?1', solution);
+    solution.push([]);
+    console.log ('does solution correction get arrays?2', solution);
+    for (let k = 0; k < n; k++) {
+      tempArr.push(0);
+      // counter++;
+    }
+    board.push(tempArr);
+  }
+  let bigArray = [];
+  for (let i = 0; i < board.length; i++) {
+    bigArray.push(...board[i]);
+  }
+
+  const findNTimes = function (currentBoard, row, piecesPlaced) {
+    let workingBoard = [...currentBoard];
+    for (let i = 0; i < n; i ++) {
+      let placedPieces = piecesPlaced;
+      if (i > 0) {
+        workingBoard[i + (row * n) - 1] = 0;
+      }
+      let rowStart = (row * n);
+      let rowEnd = ((row + 1) * n) - 1;
+      let currentIndex = i + (row * n);
+      if (Board.prototype.hasRowConflictAt(workingBoard.slice(rowStart, rowEnd + 1), 1)) {
+        workingBoard[i + (row * n)] = 0;
+        continue;
+      }
+      let colArr = [];
+      // let topOfCol = i;
+      for (let j = i; j < workingBoard.length; j += n) {
+        colArr.push(workingBoard[j]);
+      }
+      if (Board.prototype.hasColConflictAt(colArr, 1)) {
+        workingBoard[i + (row * n)] = 0;
+        continue;
+      }
       //Minor first     Current location workingBoard[currentIndex]
       let lowerMinorEnd, upperMinorEnd = false;
       let minorDiagArray = [];
@@ -173,76 +240,17 @@ window.countNRooksSolutions = function(n) {
         workingBoard[currentIndex] = 0;
         continue;
       }
-
-      workingBoard[currentIndex] = 1;
-      placedPieces++;
-      if (row === n - 1) {
-        if (placedPieces === n) {
-          solutionCount++;
-        }
-      } else {
-        findNTimes(workingBoard, row + 1, placedPieces);
-      }
-    }
-  }; 
-
-  findNTimes(bigArray, 0, 0);
-
-
-
-
-  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
-  return solutionCount;
-};
-
-// return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
-window.findNQueensSolution = function(n) {
-  var solution = []; //fixme
-  let board = []; //new Board({n:n});
-  // let counter = 0;
-  for (let i = 0; i < n; i++) {
-    let tempArr = [];
-    solution.push([]);
-    for (let k = 0; k < n; k++) {
-      tempArr.push(0);
-      // counter++;
-    }
-    board.push(tempArr);
-  }
-  let bigArray = [];
-  for (let i = 0; i < board.length; i++) {
-    bigArray.push(...board[i]);
-  }
-
-  const findNTimes = function (currentBoard, row, piecesPlaced) {
-    let workingBoard = [...currentBoard];
-    for (let i = 0; i < n; i ++) {
-      let placedPieces = piecesPlaced;
-      if (i > 0) {
-        workingBoard[i + (row * n) - 1] = 0;
-      }
-      let rowStart = (row * n);
-      let rowEnd = ((row + 1) * n) - 1;
-      if (Board.prototype.hasRowConflictAt(workingBoard.slice(rowStart, rowEnd + 1), 1)) {
-        workingBoard[i + (row * n)] = 0;
-        continue;
-      }
-      let colArr = [];
-      // let topOfCol = i;
-      for (let j = i; j < workingBoard.length; j += n) {
-        colArr.push(workingBoard[j]);
-      }
-      if (Board.prototype.hasColConflictAt(colArr, 1)) {
-        workingBoard[i + (row * n)] = 0;
-        continue;
-      }
       workingBoard[i + (row * n)] = 1;
       placedPieces++;
       if (row === n - 1) {
-        if (placedPieces === n) {
+        if (placedPieces === n && solution[0].length === 0) {
+          let workingLength = workingBoard.length;
+          console.log(`workingboard length ${workingLength}`);
           for (let i = 0; i < workingBoard.length; i++) {
             let placeRow = Math.floor(i / n);
-            solution[placeRow].push(workingBoard[i]);
+            console.log('this is solution.  ', solution, '   This is placedRow;  ', placeRow);
+            //solution[placeRow].push(workingBoard[i]);
+            solution.push("m");
           }
         }
       } else {
