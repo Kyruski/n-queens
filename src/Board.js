@@ -161,6 +161,9 @@
         let diagArr = [];
         for (let j = i; j < bigArray.length; j += n) {
           diagArr.push(bigArray[j]);
+          if (j % board.length === board.length - 1) {
+            break;
+          }
         }
 
         isTrue = this.hasMajorDiagonalConflictAt(diagArr);
@@ -186,19 +189,25 @@
       return (counter > 1) ? true : false; 
     },
 
-    // test if any minor diagonals on this board contain conflicts
     hasAnyMinorDiagonalConflicts: function() {
       let board = this.rows();
+      if (board.length === 1) {
+        return false;
+      }
       let bigArray = [];
       for (let i = 0; i < board.length; i++) {
         bigArray.push(...board[i]);
       }
+      
       let n = board.length - 1;
       let isTrue = false;
-      for (let i = 0; i < bigArray.length; i++) {
+      for (let i = 1; i < bigArray.length; i++) {
         let diagArr = [];
         for (let j = i; j < bigArray.length; j += n) {
           diagArr.push(bigArray[j]);
+          if (j % board.length === 0) {
+            break;
+          }
         }
 
         isTrue = this.hasMinorDiagonalConflictAt(diagArr);
@@ -206,6 +215,10 @@
           break;
         }
       }
+
+
+
+
       return isTrue; // fixme
     }
     

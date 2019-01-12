@@ -144,19 +144,16 @@ window.countNRooksSolutions = function(n) {
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
   if (n === 0) {
-    return 1;
+    return [];
   }
-  var solution = []; //fixme
-  let board = []; //new Board({n:n});
-  // let counter = 0;
+  var solution = []; 
+  let solutionFound = false;
+  let board = []; 
   for (let i = 0; i < n; i++) {
     let tempArr = [];
-    // console.log ('does solution correction get arrays?1', solution);
     solution.push([]);
-    // console.log ('does solution correction get arrays?2', solution);
     for (let k = 0; k < n; k++) {
       tempArr.push(0);
-      // counter++;
     }
     board.push(tempArr);
   }
@@ -168,6 +165,9 @@ window.findNQueensSolution = function(n) {
   const findNTimes = function (currentBoard, row, piecesPlaced) {
     let workingBoard = [...currentBoard];
     for (let i = 0; i < n; i ++) {
+      if (solutionFound === true) {
+        return;
+      }
       let placedPieces = piecesPlaced;
       if (i > 0) {
         workingBoard[i + (row * n) - 1] = 0;
@@ -180,7 +180,6 @@ window.findNQueensSolution = function(n) {
         continue;
       }
       let colArr = [];
-      // let topOfCol = i;
       for (let j = i; j < workingBoard.length; j += n) {
         colArr.push(workingBoard[j]);
       }
@@ -188,7 +187,6 @@ window.findNQueensSolution = function(n) {
         workingBoard[i + (row * n)] = 0;
         continue;
       }
-      //Minor first     Current location workingBoard[currentIndex]
       let lowerMinorEnd = (currentIndex % n === n - 1);
       let upperMinorEnd = (currentIndex % n === 0);
       let minorDiagArray = [];
@@ -261,6 +259,7 @@ window.findNQueensSolution = function(n) {
             let placeRow = Math.floor(i / n);
             solution[placeRow].push(workingBoard[i]);
           }
+          solutionFound = true;
         }
       } else {
         findNTimes(workingBoard, row + 1, placedPieces);
@@ -283,16 +282,11 @@ window.countNQueensSolutions = function(n) {
     return 1;
   }
   var solutionCount = 0; //fixme
-  let board = []; //new Board({n:n});
-  // let counter = 0;
+  let board = []; 
   for (let i = 0; i < n; i++) {
     let tempArr = [];
-    // console.log ('does solution correction get arrays?1', solution);
-    // solution.push([]);
-    // console.log ('does solution correction get arrays?2', solution);
     for (let k = 0; k < n; k++) {
       tempArr.push('x');
-      // counter++;
     }
     board.push(tempArr);
   }
