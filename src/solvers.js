@@ -62,8 +62,8 @@ window.checkRookCollisions = function(index, n, array, row) {
   for (let j = topOfColumn; j < array.length; j += n) {
     colArr.push(array[j]);
   }
-  if (Board.prototype.hasColConflictAt(colArr, 1) || 
-      Board.prototype.hasRowConflictAt(array.slice(rowStart, rowEnd + 1), 1)) {
+  if (Board.prototype.hasArrayConflictAt(colArr, 1) || 
+      Board.prototype.hasArrayConflictAt(array.slice(rowStart, rowEnd + 1), 1)) {
     return true;
   }
   return false;
@@ -72,8 +72,8 @@ window.checkRookCollisions = function(index, n, array, row) {
 window.checkCollisions = function(index, n, array, row) {
   const minorDiagArray = makeArrayToCheck(index, n, false, array),
         majorDiagArray = makeArrayToCheck(index, n, true, array);
-  if (Board.prototype.hasMinorDiagonalConflictAt(minorDiagArray, 1) || 
-      Board.prototype.hasMajorDiagonalConflictAt(majorDiagArray, 1) || 
+  if (Board.prototype.hasArrayConflictAt(minorDiagArray, 1) || 
+      Board.prototype.hasArrayConflictAt(majorDiagArray, 1) || 
       checkRookCollisions(index, n, array, row)) {
     return true;
   }
@@ -95,31 +95,31 @@ window.findNRooksSolution = function(n) {
 };
 
 window.countNRooksSolutions = function(n) {
-  let num = 1;
-  for (let i = 1; i <= n; i++) {
-    num *= i;
-  }
-  return num;
+  // let num = 1;
+  // for (let i = 1; i <= n; i++) {
+  //   num *= i;
+  // }
+  // return num;
 
-  // let solutionCount = 0,
-  //     [bigArray] = createBoards(n);
+  let solutionCount = 0,
+      [bigArray] = createBoards(n);
 
-  // const findNTimes = function (currentBoard, row, piecesPlaced) {
-  //   let workingBoard = [...currentBoard];
-  //   for (let i = 0; i < n; i ++) {
-  //     let placedPieces = piecesPlaced,
-  //         currentIndex = i + (row * n);
-  //     if (i > 0) workingBoard[currentIndex - 1] = 0;
-  //     if (checkRookCollisions(currentIndex, n, workingBoard, row)) continue;
-  //     else workingBoard[currentIndex] = 1;
-  //     placedPieces++;
-  //     if (row === n - 1 && placedPieces === n) solutionCount++;
-  //     else findNTimes(workingBoard, row + 1, placedPieces);
-  //   }
-  // }; 
-  // findNTimes(bigArray, 0, 0);
-  // console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
-  // return solutionCount;
+  const findNTimes = function (currentBoard, row, piecesPlaced) {
+    const workingBoard = [...currentBoard];
+    for (let i = 0; i < n; i ++) {
+      let placedPieces = piecesPlaced;
+      const currentIndex = i + (row * n);
+      if (i > 0) workingBoard[currentIndex - 1] = 0;
+      if (checkRookCollisions(currentIndex, n, workingBoard, row)) continue;
+      else workingBoard[currentIndex] = 1;
+      placedPieces++;
+      if (row === n - 1 && placedPieces === n) solutionCount++;
+      else findNTimes(workingBoard, row + 1, placedPieces);
+    }
+  }; 
+  findNTimes(bigArray, 0, 0);
+  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+  return solutionCount;
 };
 
 
@@ -128,11 +128,11 @@ window.findNQueensSolution = function(n) {
   let solutionFound = false,
       [bigArray, solution] = createBoards(n);
   const findNTimes = function (currentBoard, row, piecesPlaced) {
-    let workingBoard = [...currentBoard];
+    const workingBoard = [...currentBoard];
     for (let i = 0; i < n; i ++) {
       if (solutionFound) return;
-      let currentIndex = i + (row * n),
-          placedPieces = piecesPlaced;
+      const currentIndex = i + (row * n);
+      let placedPieces = piecesPlaced;
       if (i > 0)  workingBoard[currentIndex - 1] = 0;
       if (checkCollisions(currentIndex, n, workingBoard, row)) continue;
       else workingBoard[currentIndex] = 1;
@@ -154,7 +154,7 @@ window.countNQueensSolutions = function(n) {
   let solutionCount = 0,
       [bigArray] = createBoards(n);
   const findNTimes = function (currentBoard, row, piecesPlaced) {
-    let workingBoard = [...currentBoard];
+    const workingBoard = [...currentBoard];
     for (let i = 0; i < n; i ++) {
       let placedPieces = piecesPlaced,
           currentIndex = i + (row * n);
