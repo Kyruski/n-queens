@@ -10,10 +10,6 @@
 // (There are also optimizations that will allow you to skip a lot of the dead search space)
 // take a look at solversSpec.js to see what the tests are expecting
 
-
-// return a matrix (an array of arrays) representing a single nxn chessboard, with n rooks placed such that none of them can attack each other
-
-
 window.createBoards = function (n) {       
   const emptyBoard = [],
       bigArray = [];
@@ -36,22 +32,14 @@ window.makeArrayToCheck = function(currentIndex, n, direction, array) {
     if (lowerEnd === false) {
       const currentLowerPosition = (currentIndex) - (diagCounter * diagIncrease),
             caluclatedLower = direction ? (currentLowerPosition % n === 0) : (currentLowerPosition % n === n - 1);
-      if (currentLowerPosition >= 0) {
-        diagArray.push(array[currentLowerPosition]);
-      }
-      if (caluclatedLower || currentLowerPosition < 0) {
-        lowerEnd = true;
-      }
+      if (currentLowerPosition >= 0) diagArray.push(array[currentLowerPosition]);
+      if (caluclatedLower || currentLowerPosition < 0) lowerEnd = true;
     }
     if (upperEnd === false) {
       const currentUpperPosition = (currentIndex) + (diagCounter * diagIncrease),
             caluclatedUpper = direction ? (currentUpperPosition % n === n - 1) : (currentUpperPosition % n === 0);
-      if (currentUpperPosition < array.length) {
-        diagArray.push(array[currentUpperPosition]);
-      }
-      if (caluclatedUpper || currentUpperPosition >= array.length) {
-        upperEnd = true;
-      }
+      if (currentUpperPosition < array.length) diagArray.push(array[currentUpperPosition]);
+      if (caluclatedUpper || currentUpperPosition >= array.length) upperEnd = true;
     }
     diagCounter++;
   }
@@ -92,24 +80,16 @@ window.checkCollisions = function(index, n, array, row) {
   return false;
 };
 
-
-
-
 window.findNRooksSolution = function(n) {
   let [bigArray, solution] = createBoards(n),
       placedRooks = 0;
   for (let i = 0; i < bigArray.length; i++) {
     const row = Math.floor(i / n);
-    if (checkRookCollisions(i, n, bigArray, row)) {
-      continue;
-    } else {
-      bigArray[i] = 1;
-    }
+    if (checkRookCollisions(i, n, bigArray, row)) continue;
+    else bigArray[i] = 1;
     placedRooks++;
   }
-  if (placedRooks === n) {
-    solution = makeMatrix(solution, n, bigArray);
-  }
+  if (placedRooks === n) solution = makeMatrix(solution, n, bigArray);
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
 };
@@ -120,6 +100,7 @@ window.countNRooksSolutions = function(n) {
     num *= i;
   }
   return num;
+
   // let solutionCount = 0,
   //     [bigArray] = createBoards(n);
 
@@ -128,107 +109,64 @@ window.countNRooksSolutions = function(n) {
   //   for (let i = 0; i < n; i ++) {
   //     let placedPieces = piecesPlaced,
   //         currentIndex = i + (row * n);
-  //     if (i > 0) {
-  //       workingBoard[currentIndex - 1] = 0;
-  //     }
-  //     if (checkRookCollisions(currentIndex, n, workingBoard, row)) {
-  //       continue;
-  //     } else {
-  //       workingBoard[currentIndex] = 1;
-  //     }
+  //     if (i > 0) workingBoard[currentIndex - 1] = 0;
+  //     if (checkRookCollisions(currentIndex, n, workingBoard, row)) continue;
+  //     else workingBoard[currentIndex] = 1;
   //     placedPieces++;
-  //     if (row === n - 1) {
-  //       if (placedPieces === n) {
-  //         solutionCount++;
-  //       }
-  //     } else {
-  //       findNTimes(workingBoard, row + 1, placedPieces);
-  //     }
+  //     if (row === n - 1 && placedPieces === n) solutionCount++;
+  //     else findNTimes(workingBoard, row + 1, placedPieces);
   //   }
   // }; 
-
   // findNTimes(bigArray, 0, 0);
-
   // console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   // return solutionCount;
 };
 
 
 window.findNQueensSolution = function(n) {
-  if (n === 0) {
-    return [];
-  }
+  if (n === 0) return [];
   let solutionFound = false,
       [bigArray, solution] = createBoards(n);
-
   const findNTimes = function (currentBoard, row, piecesPlaced) {
     let workingBoard = [...currentBoard];
     for (let i = 0; i < n; i ++) {
-      if (solutionFound === true) {
-        return;
-      }
+      if (solutionFound) return;
       let currentIndex = i + (row * n),
           placedPieces = piecesPlaced;
-      if (i > 0) {
-        workingBoard[currentIndex - 1] = 0;
-      }
-      if (checkCollisions(currentIndex, n, workingBoard, row)) {
-        continue;
-      } else {
-        workingBoard[currentIndex] = 1
-      }
+      if (i > 0)  workingBoard[currentIndex - 1] = 0;
+      if (checkCollisions(currentIndex, n, workingBoard, row)) continue;
+      else workingBoard[currentIndex] = 1;
       placedPieces++;
-      if (row === n - 1) {
-        if (placedPieces === n && solution[0].length === 0) {
-          solution = makeMatrix(solution, n, workingBoard);
-          solutionFound = true;
-        }
-      } else {
-        findNTimes(workingBoard, row + 1, placedPieces);
-      }
+      if (row === n - 1 && placedPieces === n && solution[0].length === 0) {
+        solution = makeMatrix(solution, n, workingBoard);
+        solutionFound = true;
+      } else findNTimes(workingBoard, row + 1, placedPieces);
     }
-  }; 
-
+  };
   findNTimes(bigArray, 0, 0);
-
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
 };
 
-// return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
+
 window.countNQueensSolutions = function(n) {
-  if (n === 0) {
-    return 1;
-  }
+  if (n === 0) return 1;
   let solutionCount = 0,
       [bigArray] = createBoards(n);
-
   const findNTimes = function (currentBoard, row, piecesPlaced) {
     let workingBoard = [...currentBoard];
     for (let i = 0; i < n; i ++) {
       let placedPieces = piecesPlaced,
           currentIndex = i + (row * n);
-      if (i > 0) {
-        workingBoard[currentIndex - 1] = 0;
-      }
-      if (checkCollisions(currentIndex, n, workingBoard, row)) {
-        continue;
-      } else {
-        workingBoard[currentIndex] = 1
-      }
+      if (i > 0) workingBoard[currentIndex - 1] = 0;
+      if (checkCollisions(currentIndex, n, workingBoard, row)) continue;
+      else workingBoard[currentIndex] = 1
       placedPieces++;
-      if (row === n - 1) {
-        if (placedPieces === n) {
-          solutionCount++;
-        }
-      } else {
-        findNTimes(workingBoard, row + 1, placedPieces);
-      }
+      if (row === n - 1 && placedPieces === n) solutionCount++;
+      else findNTimes(workingBoard, row + 1, placedPieces);
     }
   }; 
-
   findNTimes(bigArray, 0, 0);
-
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
