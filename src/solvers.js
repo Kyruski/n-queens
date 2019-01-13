@@ -14,153 +14,152 @@
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n rooks placed such that none of them can attack each other
 
 
+window.createBoards = function (n) {       
+  const emptyBoard = [],
+      bigArray = [];
+  for (let i = 0; i < n; i++) {
+    emptyBoard.push([]);
+    for (let j = 0; j < n; j++) {
+      bigArray.push(0);
+    }
+  }
+  return [bigArray, emptyBoard];
+};
+
+window.makeArrayToCheck = function(currentIndex, n, direction, array) {
+  let lowerEnd = direction ? (currentIndex % n === 0) : (currentIndex % n === n - 1),
+      upperEnd = direction ? (currentIndex % n === n - 1): (currentIndex % n === 0),
+      diagCounter = 1;
+  const diagIncrease = direction ? n + 1 : n - 1,
+        diagArray = [];
+  while (lowerEnd === false || upperEnd === false) {
+    if (lowerEnd === false) {
+      const currentLowerPosition = (currentIndex) - (diagCounter * diagIncrease),
+            caluclatedLower = direction ? (currentLowerPosition % n === 0) : (currentLowerPosition % n === n - 1);
+      if (currentLowerPosition >= 0) {
+        diagArray.push(array[currentLowerPosition]);
+      }
+      if (caluclatedLower || currentLowerPosition < 0) {
+        lowerEnd = true;
+      }
+    }
+    if (upperEnd === false) {
+      const currentUpperPosition = (currentIndex) + (diagCounter * diagIncrease),
+            caluclatedUpper = direction ? (currentUpperPosition % n === n - 1) : (currentUpperPosition % n === 0);
+      if (currentUpperPosition < array.length) {
+        diagArray.push(array[currentUpperPosition]);
+      }
+      if (caluclatedUpper || currentUpperPosition >= array.length) {
+        upperEnd = true;
+      }
+    }
+    diagCounter++;
+  }
+  return diagArray;
+};
+
+window.makeMatrix = function(emptyArray, n, array) {
+  for (let i = 0; i < array.length; i++) {
+    const placeRow = Math.floor(i / n);
+    emptyArray[placeRow].push(array[i]);
+  }
+  return emptyArray;
+};
+
+window.checkRookCollisions = function(index, n, array, row) {
+  const rowStart = (row * n),
+        rowEnd = ((row + 1) * n) - 1,
+        colArr = [],
+        topOfColumn = index % n;
+  for (let j = topOfColumn; j < array.length; j += n) {
+    colArr.push(array[j]);
+  }
+  if (Board.prototype.hasColConflictAt(colArr, 1) || 
+      Board.prototype.hasRowConflictAt(array.slice(rowStart, rowEnd + 1), 1)) {
+    return true;
+  }
+  return false;
+};
+
+window.checkCollisions = function(index, n, array, row) {
+  const minorDiagArray = makeArrayToCheck(index, n, false, array),
+        majorDiagArray = makeArrayToCheck(index, n, true, array);
+  if (Board.prototype.hasMinorDiagonalConflictAt(minorDiagArray, 1) || 
+      Board.prototype.hasMajorDiagonalConflictAt(majorDiagArray, 1) || 
+      checkRookCollisions(index, n, array, row)) {
+    return true;
+  }
+  return false;
+};
+
+
+
 
 window.findNRooksSolution = function(n) {
-  var solution = []; 
-  let board = []; //new Board({n:n});
-  // let counter = 0;
-  for (let i = 0; i < n; i++) {
-    let tempArr = [];
-    solution.push([]);
-    for (let k = 0; k < n; k++) {
-      tempArr.push('x');
-      // counter++;
-    }
-    board.push(tempArr);
-  }
-
-  let bigArray = [];
-  for (let i = 0; i < board.length; i++) {
-    bigArray.push(...board[i]);
-  }
-
-  //major = n + 1
-  //minor n -1
-  //col n
-  //row start = (row)*n
-  //row end = ((row+1)*n)-1
-
-  let placedRooks = 0;
+  let [bigArray, solution] = createBoards(n),
+      placedRooks = 0;
   for (let i = 0; i < bigArray.length; i++) {
-    let row = Math.floor(i / n);
-    let rowStart = (row * n);
-    let rowEnd = ((row + 1) * n) - 1;
-    if (Board.prototype.hasRowConflictAt(bigArray.slice(rowStart, rowEnd + 1), 1)) {
-      bigArray[i] = 0;
+    const row = Math.floor(i / n);
+    if (checkRookCollisions(i, n, bigArray, row)) {
       continue;
+    } else {
+      bigArray[i] = 1;
     }
-    let colArr = [];
-    let topOfCol = i % n;
-    for (let j = topOfCol; j < bigArray.length; j += n) {
-      colArr.push(bigArray[j]);
-    }
-    if (Board.prototype.hasColConflictAt(colArr, 1)) {
-      bigArray[i] = 0;
-      continue;
-    }
-    bigArray[i] = 1;
     placedRooks++;
-
   }
   if (placedRooks === n) {
-    for (let i = 0; i < bigArray.length; i++) {
-      let placeRow = Math.floor(i / n);
-      solution[placeRow].push(bigArray[i]);
-    }
+    solution = makeMatrix(solution, n, bigArray);
   }
-
-  // console.log(board);
-
-
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
 };
 
-// return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = 0; 
-  let board = []; //new Board({n:n});
-  // let counter = 0;
-  for (let i = 0; i < n; i++) {
-    let tempArr = [];
-    // solution.push([]);
-    for (let k = 0; k < n; k++) {
-      tempArr.push('x');
-      // counter++;
-    }
-    board.push(tempArr);
+  let num = 1;
+  for (let i = 1; i <= n; i++) {
+    num *= i;
   }
-  let bigArray = [];
-  for (let i = 0; i < board.length; i++) {
-    bigArray.push(...board[i]);
-  }
+  return num;
+  // let solutionCount = 0,
+  //     [bigArray] = createBoards(n);
 
-  const findNTimes = function (currentBoard, row, piecesPlaced) {
-    let workingBoard = [...currentBoard];
-    for (let i = 0; i < n; i ++) {
-      let placedPieces = piecesPlaced;
-      if (i > 0) {
-        workingBoard[i + (row * n) - 1] = 0;
-      }
-      let rowStart = (row * n);
-      let rowEnd = ((row + 1) * n) - 1;
-      let currentIndex = i + (row * n);
-      if (Board.prototype.hasRowConflictAt(workingBoard.slice(rowStart, rowEnd + 1), 1)) {
-        workingBoard[currentIndex] = 0;
-        continue;
-      }
-      let colArr = [];
-      // let topOfCol = i;
-      for (let j = i; j < workingBoard.length; j += n) {
-        colArr.push(workingBoard[j]);
-      }
-      if (Board.prototype.hasColConflictAt(colArr, 1)) {
-        workingBoard[currentIndex] = 0;
-        continue;
-      }
-      
+  // const findNTimes = function (currentBoard, row, piecesPlaced) {
+  //   let workingBoard = [...currentBoard];
+  //   for (let i = 0; i < n; i ++) {
+  //     let placedPieces = piecesPlaced,
+  //         currentIndex = i + (row * n);
+  //     if (i > 0) {
+  //       workingBoard[currentIndex - 1] = 0;
+  //     }
+  //     if (checkRookCollisions(currentIndex, n, workingBoard, row)) {
+  //       continue;
+  //     } else {
+  //       workingBoard[currentIndex] = 1;
+  //     }
+  //     placedPieces++;
+  //     if (row === n - 1) {
+  //       if (placedPieces === n) {
+  //         solutionCount++;
+  //       }
+  //     } else {
+  //       findNTimes(workingBoard, row + 1, placedPieces);
+  //     }
+  //   }
+  // }; 
 
-      workingBoard[currentIndex] = 1;
-      placedPieces++;
-      if (row === n - 1) {
-        if (placedPieces === n) {
-          solutionCount++;
-        }
-      } else {
-        findNTimes(workingBoard, row + 1, placedPieces);
-      }
-    }
-  }; 
+  // findNTimes(bigArray, 0, 0);
 
-  findNTimes(bigArray, 0, 0);
-
-
-
-
-  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
-  return solutionCount;
+  // console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+  // return solutionCount;
 };
 
-// return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
+
 window.findNQueensSolution = function(n) {
   if (n === 0) {
     return [];
   }
-  var solution = []; 
-  let solutionFound = false;
-  let board = []; 
-  for (let i = 0; i < n; i++) {
-    let tempArr = [];
-    solution.push([]);
-    for (let k = 0; k < n; k++) {
-      tempArr.push(0);
-    }
-    board.push(tempArr);
-  }
-  let bigArray = [];
-  for (let i = 0; i < board.length; i++) {
-    bigArray.push(...board[i]);
-  }
+  let solutionFound = false,
+      [bigArray, solution] = createBoards(n);
 
   const findNTimes = function (currentBoard, row, piecesPlaced) {
     let workingBoard = [...currentBoard];
@@ -168,97 +167,20 @@ window.findNQueensSolution = function(n) {
       if (solutionFound === true) {
         return;
       }
-      let placedPieces = piecesPlaced;
+      let currentIndex = i + (row * n),
+          placedPieces = piecesPlaced;
       if (i > 0) {
-        workingBoard[i + (row * n) - 1] = 0;
+        workingBoard[currentIndex - 1] = 0;
       }
-      let rowStart = (row * n);
-      let rowEnd = ((row + 1) * n) - 1;
-      let currentIndex = i + (row * n);
-      if (Board.prototype.hasRowConflictAt(workingBoard.slice(rowStart, rowEnd + 1), 1)) {
-        workingBoard[i + (row * n)] = 0;
+      if (checkCollisions(currentIndex, n, workingBoard, row)) {
         continue;
+      } else {
+        workingBoard[currentIndex] = 1
       }
-      let colArr = [];
-      for (let j = i; j < workingBoard.length; j += n) {
-        colArr.push(workingBoard[j]);
-      }
-      if (Board.prototype.hasColConflictAt(colArr, 1)) {
-        workingBoard[i + (row * n)] = 0;
-        continue;
-      }
-      let lowerMinorEnd = (currentIndex % n === n - 1);
-      let upperMinorEnd = (currentIndex % n === 0);
-      let minorDiagArray = [];
-      let minorDiagIncrease = n - 1;
-      let minorDiagCounter = 1;
-      while (lowerMinorEnd === false || upperMinorEnd === false) {
-        if (lowerMinorEnd === false) {
-          let currentLowerPosition = (currentIndex) - (minorDiagCounter * minorDiagIncrease);
-          let caluclatedLower = (currentLowerPosition % n === n - 1);
-          if (currentLowerPosition >= 0) {
-            minorDiagArray.push(workingBoard[currentLowerPosition]);
-          }
-          if (caluclatedLower || currentLowerPosition < 0) {
-            lowerMinorEnd = true;
-          }
-        }
-        if (upperMinorEnd === false) {
-          let currentUpperPosition = (currentIndex) + (minorDiagCounter * minorDiagIncrease);
-          let caluclatedUpper = (currentUpperPosition % n === 0);
-          if (currentUpperPosition < workingBoard.length) {
-            minorDiagArray.push(workingBoard[currentUpperPosition]);
-          }
-          if (caluclatedUpper || currentUpperPosition >= workingBoard.length) {
-            upperMinorEnd = true;
-          }
-        }
-        minorDiagCounter++;
-      }
-      if (Board.prototype.hasMinorDiagonalConflictAt(minorDiagArray, 1)) {
-        workingBoard[currentIndex] = 0;
-        continue;
-      }
-      let lowerMajorEnd = (currentIndex % n === 0);
-      let upperMajorEnd = (currentIndex % n === n - 1);
-      let majorDiagArray = [];
-      let majorDiagIncrease = n + 1;
-      let majorDiagCounter = 1;
-      while (lowerMajorEnd === false || upperMajorEnd === false) {
-        if (lowerMajorEnd === false) {
-          let currentLowerPosition = (currentIndex) - (majorDiagCounter * majorDiagIncrease);
-          let caluclatedLower = (currentLowerPosition % n === 0);
-          if (currentLowerPosition >= 0) {
-            majorDiagArray.push(workingBoard[currentLowerPosition]);
-          }
-          if (caluclatedLower || currentLowerPosition < 0) {
-            lowerMajorEnd = true;
-          }
-        }
-        if (upperMajorEnd === false) {
-          let currentUpperPosition = (currentIndex) + (majorDiagCounter * majorDiagIncrease);
-          let caluclatedUpper = (currentUpperPosition % n === n - 1);
-          if (currentUpperPosition < workingBoard.length) {
-            majorDiagArray.push(workingBoard[currentUpperPosition]);
-          }
-          if (caluclatedUpper || currentUpperPosition >= workingBoard.length) {
-            upperMajorEnd = true;
-          }
-        }
-        majorDiagCounter++;
-      }
-      if (Board.prototype.hasMajorDiagonalConflictAt(majorDiagArray, 1)) {
-        workingBoard[currentIndex] = 0;
-        continue;
-      }
-      workingBoard[i + (row * n)] = 1;
       placedPieces++;
       if (row === n - 1) {
         if (placedPieces === n && solution[0].length === 0) {
-          for (let i = 0; i < workingBoard.length; i++) {
-            let placeRow = Math.floor(i / n);
-            solution[placeRow].push(workingBoard[i]);
-          }
+          solution = makeMatrix(solution, n, workingBoard);
           solutionFound = true;
         }
       } else {
@@ -269,9 +191,6 @@ window.findNQueensSolution = function(n) {
 
   findNTimes(bigArray, 0, 0);
 
-
-
-
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
 };
@@ -281,109 +200,22 @@ window.countNQueensSolutions = function(n) {
   if (n === 0) {
     return 1;
   }
-  var solutionCount = 0; //fixme
-  let board = []; 
-  for (let i = 0; i < n; i++) {
-    let tempArr = [];
-    for (let k = 0; k < n; k++) {
-      tempArr.push('x');
-    }
-    board.push(tempArr);
-  }
-  let bigArray = [];
-  for (let i = 0; i < board.length; i++) {
-    bigArray.push(...board[i]);
-  }
+  let solutionCount = 0,
+      [bigArray] = createBoards(n);
 
   const findNTimes = function (currentBoard, row, piecesPlaced) {
     let workingBoard = [...currentBoard];
     for (let i = 0; i < n; i ++) {
-      let placedPieces = piecesPlaced;
+      let placedPieces = piecesPlaced,
+          currentIndex = i + (row * n);
       if (i > 0) {
-        workingBoard[i + (row * n) - 1] = 0;
+        workingBoard[currentIndex - 1] = 0;
       }
-      let rowStart = (row * n);
-      let rowEnd = ((row + 1) * n) - 1;
-      let currentIndex = i + (row * n);
-      if (Board.prototype.hasRowConflictAt(workingBoard.slice(rowStart, rowEnd + 1), 1)) {
-        workingBoard[i + (row * n)] = 0;
+      if (checkCollisions(currentIndex, n, workingBoard, row)) {
         continue;
+      } else {
+        workingBoard[currentIndex] = 1
       }
-      let colArr = [];
-      // let topOfCol = i;
-      for (let j = i; j < workingBoard.length; j += n) {
-        colArr.push(workingBoard[j]);
-      }
-      if (Board.prototype.hasColConflictAt(colArr, 1)) {
-        workingBoard[i + (row * n)] = 0;
-        continue;
-      }
-      //Minor first     Current location workingBoard[currentIndex]
-      let lowerMinorEnd = (currentIndex % n === n - 1);
-      let upperMinorEnd = (currentIndex % n === 0);
-      let minorDiagArray = [];
-      let minorDiagIncrease = n - 1;
-      let minorDiagCounter = 1;
-      while (lowerMinorEnd === false || upperMinorEnd === false) {
-        if (lowerMinorEnd === false) {
-          let currentLowerPosition = (currentIndex) - (minorDiagCounter * minorDiagIncrease);
-          let caluclatedLower = (currentLowerPosition % n === n - 1);
-          if (currentLowerPosition >= 0) {
-            minorDiagArray.push(workingBoard[currentLowerPosition]);
-          }
-          if (caluclatedLower || currentLowerPosition < 0) {
-            lowerMinorEnd = true;
-          }
-        }
-        if (upperMinorEnd === false) {
-          let currentUpperPosition = (currentIndex) + (minorDiagCounter * minorDiagIncrease);
-          let caluclatedUpper = (currentUpperPosition % n === 0);
-          if (currentUpperPosition < workingBoard.length) {
-            minorDiagArray.push(workingBoard[currentUpperPosition]);
-          }
-          if (caluclatedUpper || currentUpperPosition >= workingBoard.length) {
-            upperMinorEnd = true;
-          }
-        }
-        minorDiagCounter++;
-      }
-      if (Board.prototype.hasMinorDiagonalConflictAt(minorDiagArray, 1)) {
-        workingBoard[currentIndex] = 0;
-        continue;
-      }
-      let lowerMajorEnd = (currentIndex % n === 0);
-      let upperMajorEnd = (currentIndex % n === n - 1);
-      let majorDiagArray = [];
-      let majorDiagIncrease = n + 1;
-      let majorDiagCounter = 1;
-      while (lowerMajorEnd === false || upperMajorEnd === false) {
-        if (lowerMajorEnd === false) {
-          let currentLowerPosition = (currentIndex) - (majorDiagCounter * majorDiagIncrease);
-          let caluclatedLower = (currentLowerPosition % n === 0);
-          if (currentLowerPosition >= 0) {
-            majorDiagArray.push(workingBoard[currentLowerPosition]);
-          }
-          if (caluclatedLower || currentLowerPosition < 0) {
-            lowerMajorEnd = true;
-          }
-        }
-        if (upperMajorEnd === false) {
-          let currentUpperPosition = (currentIndex) + (majorDiagCounter * majorDiagIncrease);
-          let caluclatedUpper = (currentUpperPosition % n === n - 1);
-          if (currentUpperPosition < workingBoard.length) {
-            majorDiagArray.push(workingBoard[currentUpperPosition]);
-          }
-          if (caluclatedUpper || currentUpperPosition >= workingBoard.length) {
-            upperMajorEnd = true;
-          }
-        }
-        majorDiagCounter++;
-      }
-      if (Board.prototype.hasMajorDiagonalConflictAt(majorDiagArray, 1)) {
-        workingBoard[currentIndex] = 0;
-        continue;
-      }
-      workingBoard[i + (row * n)] = 1;
       placedPieces++;
       if (row === n - 1) {
         if (placedPieces === n) {
