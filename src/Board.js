@@ -79,16 +79,14 @@
     //
     // test if a specific row on this board contains a conflict
     hasArrayConflictAt: function(rowIndex, counter = 0) {
-      for (let index of rowIndex) {
-        if (index === 1) counter++;
-      }
+      rowIndex.reduce((total, index) => { if (index === 1) counter++; }, 0);
       return (counter > 1) ? true : false; 
     },
 
     // test if any rows on this board contain conflicts
     hasAnyRowConflicts: function() {
-      let board = this.rows(),
-          isTrue = false;
+      const board = this.rows();
+      let isTrue = false;
       for (let i = 0; i < board.length; i++) {
         isTrue = this.hasArrayConflictAt(board[i]);
         if (isTrue) break;
@@ -106,10 +104,10 @@
 
     // test if any columns on this board contain conflicts
     hasAnyColConflicts: function() {
-      let board = this.rows(),
-          isTrue = false;
+      const board = this.rows();
+      let isTrue = false;
       for (let i = 0; i < board.length; i++) {
-        let columnArr = [];
+        const columnArr = [];
         for (let j = 0; j < board.length; j++) {
           columnArr.push(board[j][i]);
         }
